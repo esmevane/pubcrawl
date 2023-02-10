@@ -1,6 +1,6 @@
 [package]
 name = "pubcrawl"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "An activity pub feed reader for the command line"
 homepage = "https://github.com/esmevane/pubcrawl"
