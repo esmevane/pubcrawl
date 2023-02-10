@@ -1,15 +1,32 @@
 //! Apread is a command-line feed reader for ActivityPub urls
 #![deny(missing_docs)]
 
-use clap::Parser;
+use clap::{Args, Parser, ValueEnum};
+use owo_colors::OwoColorize;
 use reqwest::header::ACCEPT;
 use serde::Deserialize;
 use thiserror::Error;
 use tokio;
 
 #[derive(Debug, Parser)]
+#[clap(author, version, about)]
 struct Cli {
   handle: String,
+  #[clap(flatten)]
+  global: GlobalOptions,
+}
+
+#[derive(Args, Debug)]
+struct GlobalOptions {
+  #[clap(long, value_enum, global = true, default_value_t = Color::Auto)]
+  color: Color,
+}
+
+#[derive(Clone, Debug, ValueEnum)]
+enum Color {
+  Always,
+  Auto,
+  Never,
 }
 
 #[derive(Clone, Debug)]
@@ -181,6 +198,13 @@ impl Item {
       Self::Post { object, .. } => html2md::parse_html(&object.content),
     }
   }
+
+  fn published_on(&self) -> String {
+    match self {
+      Self::Boost => String::new(),
+      Self::Post { published, .. } => published.clone(),
+    }
+  }
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -238,10 +262,15 @@ async fn main() -> Result<(), ApreadErrors> {
   let options = textwrap::Options::new(80);
 
   for post in page.posts() {
-    println!("{:>15}\n", handle.id);
+    let id = handle.id.bright_magenta();
+    let published = post.published_on();
+    let published = published.cyan();
+
+    println!(" {id} ({published})\n");
 
     for line in textwrap::wrap(&post.markdown_content(), &options) {
-      println!("     {}", line);
+      let line = line.bright_white();
+      println!("   {line}");
     }
 
     println!();
