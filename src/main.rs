@@ -1,6 +1,9 @@
 //! Apread is a command-line feed reader for ActivityPub urls
 #![deny(missing_docs)]
 
+use activitystreams::{
+  base::AsBase, collection::OrderedCollection, prelude::*,
+};
 use clap::{Args, Parser, ValueEnum};
 use owo_colors::OwoColorize;
 use reqwest::header::ACCEPT;
@@ -238,7 +241,7 @@ async fn main() -> Result<(), ApreadErrors> {
     .await?;
 
   let index = client
-    .get(actor.outbox)
+    .get(actor.outbox.clone())
     .header(
       ACCEPT,
       "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"",
@@ -247,6 +250,24 @@ async fn main() -> Result<(), ApreadErrors> {
     .await?
     .json::<OutboxIndex>()
     .await?;
+
+  let ap_page = client
+    .get(actor.outbox.clone())
+    .header(
+      ACCEPT,
+      "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"",
+    )
+    .send()
+    .await?
+    .json::<activitystreams::collection::OrderedCollection>()
+    // .text()
+    .await?;
+
+  //   let mut ap_page = ap_page.base_mut();
+  //   let first = ap_page.first().expect("wtaf");
+  //   ap_page
+
+  println!("{}", ap_page.first().unwrap().id().unwrap());
 
   let page = client
     .get(index.first)
@@ -261,20 +282,20 @@ async fn main() -> Result<(), ApreadErrors> {
 
   let options = textwrap::Options::new(80);
 
-  for post in page.posts() {
-    let id = handle.id.bright_magenta();
-    let published = post.published_on();
-    let published = published.cyan();
+  //   for post in page.posts() {
+  //     let id = handle.id.bright_magenta();
+  //     let published = post.published_on();
+  //     let published = published.cyan();
 
-    println!(" {id} ({published})\n");
+  //     println!(" {id} ({published})\n");
 
-    for line in textwrap::wrap(&post.markdown_content(), &options) {
-      let line = line.bright_white();
-      println!("   {line}");
-    }
+  //     for line in textwrap::wrap(&post.markdown_content(), &options) {
+  //       let line = line.bright_white();
+  //       println!("   {line}");
+  //     }
 
-    println!();
-  }
+  //     println!();
+  //   }
 
   Ok(())
 }
