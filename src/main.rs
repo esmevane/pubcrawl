@@ -144,6 +144,20 @@ enum Link {
   /// ```
   #[serde(rename = "http://ostatus.org/schema/1.0/subscribe")]
   Subscribe,
+  /// This represents an avatar section for the actor.
+  ///
+  /// The actual structure here is closer to this:
+  ///
+  /// ```
+  ///  Avatar {
+  ///    href: String,
+  ///    #[serde(rename = "type")]
+  ///    media_type: String,
+  ///  }
+  /// ```
+  ///
+  #[serde(rename = "http://webfinger.net/rel/avatar")]
+  Avatar,
 }
 
 #[derive(Debug, Deserialize)]
