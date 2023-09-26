@@ -1,6 +1,6 @@
 [package]
 name = "pubcrawl"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "An activity pub feed reader for the command line"
 homepage = "https://github.com/esmevane/pubcrawl"
@@ -14,7 +14,10 @@ anyhow = "1.0.69"
 clap = { version = "4.1.4", features = ["derive"] }
 config = "0.13.3"
 html2md = "0.2.14"
-owo-colors = { version = "3.5.0", features = ["supports-color", "supports-colors"] }
+owo-colors = { version = "3.5.0", features = [
+  "supports-color",
+  "supports-colors",
+] }
 reqwest = { version = "0.11.14", features = ["rustls", "json", "cookies"] }
 serde = { version = "1.0.152", features = ["derive"] }
 serde_json = "1.0.93"
@@ -32,4 +35,3 @@ tokio = { version = "1.25.0", features = [
 inherits = "release"
 debug = true
 split-debuginfo = "packed"
-
